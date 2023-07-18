@@ -7,10 +7,23 @@ let db;
 
 const getAll = (tableName) => {
     db.query('SELECT * FROM ??', tableName, (err, results) => {
+        if (err) {
+            return console.error(err);
+        }
         console.table(results);
         init();
     });
-}
+};
+
+const insertEmployee = (data) => {
+    db.query('INSERT INTO employees SET ?', data, (err, results) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Employee added!');
+        init();
+    });
+};
 
 const handleAction = ({ action }) => {
     switch (action) {
@@ -24,6 +37,19 @@ const handleAction = ({ action }) => {
         }
         case 'View All Roles': {
             getAll('roles');
+            break;
+        }
+        case 'Add Employee': {
+            prompt([
+                {
+                    name: 'first_name',
+                    message: 'Enter employee first name?',
+                },
+                {
+                    name: 'last_name',
+                    message: 'Enter employee last name?',
+                }
+            ]).then(insertEmployee);
             break;
         }
         default: {
@@ -41,6 +67,7 @@ const init = () => {
             'View All Employees',
             'View All Departments',
             'View All Roles',
+            'Add Employee',
             'Exit',
         ]
     }).then(handleAction);

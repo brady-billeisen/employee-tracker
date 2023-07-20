@@ -143,6 +143,51 @@ const addRole = () => {
     });
 };
 
+const updateEmployeeRole = (data) => {
+    db.query('UPDATE employees SET role_id = ? WHERE id = ?', [data.role_id, data.employee_id], (err, results) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Employee role updated!');
+        init();
+    });
+};
+
+const updateEmployeeRolePrompt = () => {
+    db.query('SELECT * FROM employees', (err, employees) => {
+        if (err) {
+            return console.error(err);
+        }
+
+        db.query('SELECT * FROM roles', (err, roles) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            prompt([
+                {
+                    name: 'employee_id',
+                    message: 'Select the employee to update:',
+                    type: 'rawlist',
+                    choices: employees.map((employee) => ({
+                        name: `${employee.first_name} ${employee.last_name}`,
+                        value: employee.id,
+                    })),
+                },
+                {
+                    name: 'role_id',
+                    message: 'Select the new role for the employee:',
+                    type: 'rawlist',
+                    choices: roles.map((role) => ({
+                        name: role.title,
+                        value: role.id,
+                    })),
+                },
+            ]).then(updateEmployeeRole);
+        });
+    });
+};
+
 const handleAction = ({ action }) => {
     switch (action) {
         case 'View All Employees': {
@@ -170,7 +215,7 @@ const handleAction = ({ action }) => {
             break;
         }
         case 'Update Employee Role': {
-            updateEmployeeRole();
+            updateEmployeeRolePrompt();
             break;
         }
         default: {

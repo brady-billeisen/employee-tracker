@@ -55,21 +55,21 @@ const addEmployeeDetails = (roles, employees) => {
     prompt([
         {
             name: 'first_name',
-            message: 'Enter employee first name?',
+            message: 'Enter employee first name:',
         },
         {
             name: 'last_name',
-            message: 'Enter employee last name?',
+            message: 'Enter employee last name:',
         },
         {
             name: 'role_id',
-            message: 'Enter employee role?',
+            message: 'Enter employee role:',
             type: 'rawlist',
             choices: roles,
         },
         {
             name: 'manager_id',
-            message: 'Enter employee manager?',
+            message: 'Enter employee manager:',
             type: 'rawlist',
             choices: employees,
         }
@@ -85,6 +85,61 @@ const queryAndSendRoles = () => {
 const queryAndSendEmployees = (roles) => {
     db.query('SELECT id AS value, CONCAT(first_name, " ", last_name) AS name FROM employees', (err, employees) => {
         addEmployeeDetails(roles, employees);
+    });
+};
+
+const insertDepartment = (data) => {
+    db.query('INSERT INTO departments SET ?', data, (err, results) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Department added!');
+        init();
+    });
+};
+
+const addDepartment = () => {
+    prompt({
+        name: 'name',
+        message: 'Enter the department name:',
+    }).then(insertDepartment);
+};
+
+const insertRole = (data) => {
+    db.query('INSERT INTO roles SET ?', data, (err, results) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Role added!');
+        init();
+    });
+};
+
+const addRole = () => {
+    db.query('SELECT * FROM departments', (err, departments) => {
+        if (err) {
+            return console.error(err);
+        }
+
+        prompt([
+            {
+                name: 'title',
+                message: 'Enter the role title:',
+            },
+            {
+                name: 'salary',
+                message: 'Enter the role salary:',
+            },
+            {
+                name: 'department_id',
+                message: 'Select the department for the role:',
+                type: 'rawlist',
+                choices: departments.map((department) => ({
+                    name: department.name,
+                    value: department.id,
+                })),
+            },
+        ]).then(insertRole);
     });
 };
 
@@ -106,6 +161,18 @@ const handleAction = ({ action }) => {
             queryAndSendRoles();
             break;
         }
+        case 'Add Department': {
+            addDepartment();
+            break;
+        }
+        case 'Add Role': {
+            addRole();
+            break;
+        }
+        case 'Update Employee Role': {
+            updateEmployeeRole();
+            break;
+        }
         default: {
             process.exit();
         }
@@ -122,6 +189,9 @@ const init = () => {
             'View All Departments',
             'View All Roles',
             'Add Employee',
+            'Add Department',
+            'Add Role',
+            'Update Employee Role',
             'Exit',
         ]
     }).then(handleAction);

@@ -15,6 +15,32 @@ const getAll = (tableName) => {
     });
 };
 
+const getAllEmployees = () => {
+    db.query(`
+SELECT
+    employees.id,
+    CONCAT(employees.first_name, ' ', employees.last_name) AS name,
+    title AS role,
+    salary,
+    departments.name AS department,
+    employees.manager_id,
+    CONCAT(managers.first_name, ' ', managers.last_name) AS manager
+FROM employees
+LEFT JOIN roles
+ON employees.role_id = roles.id
+LEFT JOIN departments
+ON roles.department_id = departments.id
+LEFT JOIN employees AS managers
+ON employees.manager_id = managers.id
+`, (err, results) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.table(results);
+        init();
+    });
+};
+
 const insertEmployee = (data) => {
     db.query('INSERT INTO employees SET ?', data, (err, results) => {
         if (err) {
@@ -25,10 +51,47 @@ const insertEmployee = (data) => {
     });
 };
 
+const addEmployeeDetails = (roles, employees) => {
+    prompt([
+        {
+            name: 'first_name',
+            message: 'Enter employee first name?',
+        },
+        {
+            name: 'last_name',
+            message: 'Enter employee last name?',
+        },
+        {
+            name: 'role_id',
+            message: 'Enter employee role?',
+            type: 'rawlist',
+            choices: roles,
+        },
+        {
+            name: 'manager_id',
+            message: 'Enter employee manager?',
+            type: 'rawlist',
+            choices: employees,
+        }
+    ]).then(insertEmployee);
+};
+
+const queryAndSendRoles = () => {
+    db.query('SELECT id AS value, title AS name FROM roles', (err, roles) => {
+        queryAndSendEmployees(roles);
+    });
+};
+
+const queryAndSendEmployees = (roles) => {
+    db.query('SELECT id AS value, CONCAT(first_name, " ", last_name) AS name FROM employees', (err, employees) => {
+        addEmployeeDetails(roles, employees);
+    });
+};
+
 const handleAction = ({ action }) => {
     switch (action) {
         case 'View All Employees': {
-            getAll('employees');
+            getAllEmployees();
             break;
         }
         case 'View All Departments': {
@@ -40,16 +103,7 @@ const handleAction = ({ action }) => {
             break;
         }
         case 'Add Employee': {
-            prompt([
-                {
-                    name: 'first_name',
-                    message: 'Enter employee first name?',
-                },
-                {
-                    name: 'last_name',
-                    message: 'Enter employee last name?',
-                }
-            ]).then(insertEmployee);
+            queryAndSendRoles();
             break;
         }
         default: {

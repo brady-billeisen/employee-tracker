@@ -4,8 +4,8 @@ USE employee_db;
 INSERT INTO departments (name)
     VALUES ('Sales'), ('Web Development');
 -- 2 roles
-INSERT INTO roles (title, salary)
-    VALUES ('Outbound Agent', 50000), ('Software Engineer', 100000);
+INSERT INTO roles (title, salary, department_id)
+    VALUES ('Outbound Agent', 50000, 1), ('Software Engineer', 100000, 2);
 -- 3 employees
-INSERT INTO employees (first_name, last_name)
-    VALUES ('Peter', 'Griffin'), ('Joe', 'Swanson'), ('Glenn', 'Quagmire');
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
+    VALUES ('Peter', 'Griffin', 1, null), ('Joe', 'Swanson', 1, 1), ('Glenn', 'Quagmire', 2, null);

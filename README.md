@@ -21,7 +21,7 @@ To use the application, run `node index.js` in the command line. You will be pre
 This project is not open to contributions at this time.
 
 ## Visuals
-[Demo Video](https://www.awesomescreenshot.com/video/19354405)
+[Demo Video](https://www.awesomescreenshot.com/video/19354405?key=95fe5dc5ffd5a3de0dc1b55f04e93167)
 ## License
 This application is covered under the MIT license.
 
